@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
-class Players(BaseModel):
+class Player(BaseModel):
     name: str
     hero_points: int

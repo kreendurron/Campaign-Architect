@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pymongo.mongo_client import MongoClient
 from dotenv import load_dotenv
 import os
-from routes.players_routes import players_router
+from routes.players_route import players_router
 from routes.routes import router
 
 app = FastAPI()
