@@ -1,6 +1,6 @@
-# players_routes.py
-from fastapi import APIRouter, HTTPException
-from models.players import Players  # assuming your Pydantic model is defined here
+# players_route.py
+from fastapi import APIRouter, HTTPException, Body
+from models.player import Player  # assuming your Pydantic model is defined here
 from config.database import players_collection  # assuming you have a MongoDB collection setup
 from schema.schemas import serialize_player, serialize_players  # your serialization functions
 from bson import ObjectId
@@ -23,14 +23,14 @@ async def get_player(player_id: str):
     else:
         raise HTTPException(status_code=404, detail=f"Player not found with ID: {player_id}")
 
-@players_router.post("/players", response_model=Players)
-async def create_player(player: Players):
+@players_router.post("/players", response_model=Player)
+async def create_player(player: Player):
     new_player = players_collection.insert_one(player.dict())
     created_player = players_collection.find_one({"_id": new_player.inserted_id})
     return serialize_player(created_player)
 
-@players_router.put("/players/{player_id}", response_model=Players)
-async def update_player(player_id: str, updated_player: Players):
+@players_router.put("/players/{player_id}", response_model=Player)
+async def update_player(player_id: str, updated_player: Player):
     if not ObjectId.is_valid(player_id):
         raise HTTPException(status_code=400, detail=f"Invalid player ID: {player_id}")
 
@@ -40,6 +40,26 @@ async def update_player(player_id: str, updated_player: Players):
         return serialize_player(player)
     else:
         raise HTTPException(status_code=404, detail=f"Player not found with ID: {player_id}")
+
+@players_router.patch("/players/{player_id}")
+async def update_player_partial(player_id: str, player_update: dict = Body(...)):
+    if not ObjectId.is_valid(player_id):
+        raise HTTPException(status_code=400, detail=f"Invalid player ID: {player_id}")
+
+    # Fetch the existing player
+    existing_player = players_collection.find_one({"_id": ObjectId(player_id)})
+    if not existing_player:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    # Update only the fields provided in player_update
+    players_collection.update_one({"_id": ObjectId(player_id)}, {"$set": player_update})
+
+    # Fetch the updated player data
+    updated_player = players_collection.find_one({"_id": ObjectId(player_id)})
+    if updated_player is not None:
+        return serialize_player(updated_player)
+    else:
+        raise HTTPException(status_code=404, detail="Player not found after update")
 
 @players_router.delete("/players/{player_id}")
 async def delete_player(player_id: str):
