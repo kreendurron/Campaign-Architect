@@ -8,7 +8,6 @@ app = FastAPI()
 # Load environment variables from .env file
 load_dotenv()
 
-from pymongo.mongo_client import MongoClient
 uri = os.getenv("MONGODB_URI")
 
 # Create a new client and connect to the server
