@@ -1,0 +1,12 @@
+# Ignore all log files
+*.log
+
+# Ignore node_modules directory in a Node.js project
+node_modules/
+
+# Ignore the .env file which contains environment variables
+.env
+
+# Ignore Python virtual environments
+venv/
+.venv/
