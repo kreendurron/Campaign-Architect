@@ -11,4 +11,5 @@ client = MongoClient(uri)
 
 db = client.dnd
 
-COL_CHARACTERS = db["CHARACTERS"]
+characters_collection = db["CHARACTERS"]
+players_collection = db["PLAYERS"]
